@@ -17,6 +17,7 @@ dependencies = [
 
 [project.scripts]
 twitter_finetune = "twitter_finetune.main:main"
+twitter_scraper = "twitter_finetune.utils.get_tweets:sync_main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
