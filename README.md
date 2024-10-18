@@ -2,7 +2,7 @@
 
 ## Project Description
 
-[Short description of your project]
+Example walkthrough of finetuning a model.
 
 ## Installation
 

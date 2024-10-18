@@ -1,6 +1,11 @@
+.env.example
+.gitignore
 LICENSE
 README.md
 pyproject.toml
+data/dataprep.py
+data/tweets.csv
+data/tweets.jsonl
 src/twitter_finetune/__init__.py
 src/twitter_finetune/main.py
 src/twitter_finetune.egg-info/PKG-INFO
@@ -9,3 +14,5 @@ src/twitter_finetune.egg-info/dependency_links.txt
 src/twitter_finetune.egg-info/entry_points.txt
 src/twitter_finetune.egg-info/requires.txt
 src/twitter_finetune.egg-info/top_level.txt
+src/twitter_finetune/utils/__init__.py
+src/twitter_finetune/utils/dataprep.py
