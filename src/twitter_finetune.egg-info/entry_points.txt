@@ -1,0 +1,2 @@
+[console_scripts]
+twitter_finetune = twitter_finetune.main:main
