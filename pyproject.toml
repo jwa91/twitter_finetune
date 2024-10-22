@@ -18,6 +18,7 @@ dependencies = [
 [project.scripts]
 twitter_finetune = "twitter_finetune.main:main"
 create_jsonl = "twitter_finetune.utils.dataprep:main"
+split_jsonl = "twitter_finetune.utils.datasplit:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
