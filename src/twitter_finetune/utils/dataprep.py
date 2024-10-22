@@ -41,15 +41,10 @@ def create_llama_jsonl(input_csv, output_jsonl):
 # Mistral
 def create_mistral_jsonl(input_csv, output_jsonl):
     with open(input_csv, mode='r', encoding='utf-8') as csvfile, open(output_jsonl, mode='w', encoding='utf-8') as jsonlfile:
-        csv_reader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-
+        csv_reader = csv.DictReader(csvfile)
         for row in csv_reader:
-            try:
-                query = row['Query'].strip()
-                answer = row['Answer'].strip()
-            except KeyError as e:
-                raise KeyError(f"Kolom niet gevonden: {e}")
-
+            query = row['Query']
+            answer = row['Answer']
             jsonl_data = {
                 "text": f"[INST] Write an Opta-style tweet about the following: {query}[/INST]{answer}"
             }
