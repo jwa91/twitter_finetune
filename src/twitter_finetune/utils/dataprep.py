@@ -1,47 +1,74 @@
-import os
-import pandas as pd
+"""
+dataprep.py
+
+Dit script converteert een CSV-bestand met query's en antwoorden naar een JSONL-formaat, geschikt voor het finetunen van verschillende large language models (LLMs), zoals LLaMA en Mistral. De CSV-bestanden worden gelezen vanuit een directory die wordt gespecificeerd in een .env-bestand, en de gegenereerde JSONL-bestanden worden in dezelfde directory opgeslagen.
+
+Gebruik:
+
+    create_jsonl <model>
+
+Waarbij <model> kan zijn:
+    - "llama": Converteert de CSV naar het JSONL-formaat voor finetuning van een LLaMA-model.
+    - "mistral": Converteert de CSV naar het JSONL-formaat voor finetuning van een Mistral-model.
+"""
+
+
+import csv
 import json
+import os
+import argparse
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def load_csv():
-    data_filepath = os.getenv("DATA_FILEPATH")
-    csv_file_path = os.path.join(data_filepath, 'tweets.csv')
-    return pd.read_csv(csv_file_path), csv_file_path
+data_filepath = os.getenv('DATA_FILEPATH')
+input_csv_path = os.path.join(data_filepath, 'tweets.csv')
+output_jsonl_path_llama = os.path.join(data_filepath, 'tweets-llama.jsonl')
+output_jsonl_path_mistral = os.path.join(data_filepath, 'tweets-mistral.jsonl')
 
-def generate_llama_jsonl(df):
-    system_prompt = "<|start_header_id|>system<|end_header_id|>\n\nCutting Knowledge Date: December 2023\n\nYou are a helpful assistant.\n<|eot_id|>"
-    
-    def convert_row_llama(row):
-        user_prompt = f"<|start_header_id|>user<|end_header_id|>\n\nWrite an Opta-style tweet about the following: {row['Q']}\n<|eot_id|>"
-        assistant_response = f"<|start_header_id|>assistant<|end_header_id|>\n\n{row['A']}"
-        return {
-            "prompt": f"{system_prompt}\n{user_prompt}\n{assistant_response}"
-        }
-    
-    return df.apply(lambda row: json.dumps(convert_row_llama(row)), axis=1)
+# LLaMA
+def create_llama_jsonl(input_csv, output_jsonl):
+    with open(input_csv, mode='r', encoding='utf-8') as csvfile, open(output_jsonl, mode='w', encoding='utf-8') as jsonlfile:
+        csv_reader = csv.DictReader(csvfile)
+        for row in csv_reader:
+            query = row['Query']
+            answer = row['Answer']
+            jsonl_data = {
+                "text": f"<|start_header_id|>system<|end_header_id|> Cutting Knowledge Date: December 2023 Write an Opta-style tweet about the following:<|eot_id|> <|start_header_id|>user<|end_header_id|> {query}<|eot_id|> <|start_header_id|>assistant<|end_header_id|> {answer}<|eot_id|>"
+            }
+            jsonlfile.write(json.dumps(jsonl_data) + '\n')
 
-def save_jsonl(jsonl_data, output_file_name):
-    output_dir = os.getenv("DATA_FILEPATH")
-    output_file_path = os.path.join(output_dir, output_file_name)
-    
-    with open(output_file_path, 'w', encoding='utf-8') as f:
-        for entry in jsonl_data:
-            f.write(f"{entry}\n")
-    
-    print(f"JSONL file created: {output_file_path}")
+# Mistral
+def create_mistral_jsonl(input_csv, output_jsonl):
+    with open(input_csv, mode='r', encoding='utf-8') as csvfile, open(output_jsonl, mode='w', encoding='utf-8') as jsonlfile:
+        csv_reader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
 
-def create_llama_jsonl():
-    df, csv_file_path = load_csv()
-    
-    base_name = os.path.splitext(os.path.basename(csv_file_path))[0]
-    output_file_name = f"{base_name}_llama.jsonl"
-    
-    jsonl_data = generate_llama_jsonl(df)
-    
-    save_jsonl(jsonl_data, output_file_name)
+        for row in csv_reader:
+            try:
+                query = row['Query'].strip()
+                answer = row['Answer'].strip()
+            except KeyError as e:
+                raise KeyError(f"Kolom niet gevonden: {e}")
 
-# Uitvoeren van het script voor Llama als dit direct wordt aangeroepen
+            jsonl_data = {
+                "text": f"[INST] Write an Opta-style tweet about the following: {query}[/INST]{answer}"
+            }
+            jsonlfile.write(json.dumps(jsonl_data) + '\n')
+
+def main():
+    parser = argparse.ArgumentParser(description="Convert CSV to JSONL for finetuning LLaMA or Mistral")
+    parser.add_argument(
+        "model",
+        type=str,
+        choices=["llama", "mistral"],
+        help="Specify whether to create JSONL for 'llama' or 'mistral'"
+    )
+    args = parser.parse_args()
+
+    if args.model == "llama":
+        create_llama_jsonl(input_csv_path, output_jsonl_path_llama)
+    elif args.model == "mistral":
+        create_mistral_jsonl(input_csv_path, output_jsonl_path_mistral)
+
 if __name__ == "__main__":
-    create_llama_jsonl()
+    main()

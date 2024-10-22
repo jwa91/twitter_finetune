@@ -17,7 +17,7 @@ dependencies = [
 
 [project.scripts]
 twitter_finetune = "twitter_finetune.main:main"
-create_llama_jsonl = "twitter_finetune.utils.dataprep:create_llama_jsonl"
+create_jsonl = "twitter_finetune.utils.dataprep:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
