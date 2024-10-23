@@ -5,5 +5,9 @@ __DS.Store__
 cookies.txt
 __pycache__
 src/twitter_finetune.egg-info
+adapters_mistral
 adapters
+adapters_llama
 .DS_Store
+meta-llama_Llama-3.2-3B-Instruct
+hfdownloader
