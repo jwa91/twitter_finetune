@@ -13,6 +13,8 @@ dependencies = [
     "python-dotenv",
     "openllm",
     "pandas",
+    "mlx-lm",
+    "huggingface_hub[cli]",
 ]
 
 [project.scripts]

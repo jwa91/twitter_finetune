@@ -5,3 +5,5 @@ __DS.Store__
 cookies.txt
 __pycache__
 src/twitter_finetune.egg-info
+adapters
+.DS_Store
